@@ -15,8 +15,21 @@ class Article extends Model implements AuthorizableContract
 
   protected $table = 'articles';
   protected $fillable = [
-    'title', 'content', 'image_url'
+    'title', 'content', 'image_url', 'is_highlighted'
   ];
+
+  protected $hidden = [
+    'deleted_at',
+  ];
+
+  protected static function boot(): void
+  {
+    parent::boot();
+    self::creating(function (Article $article) {
+      $article->author_id = auth()->id();
+      return $article;
+    });
+  }
 
   public function author(): BelongsTo
   {
