@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Auth\Authenticatable;
 use Laravel\Lumen\Auth\Authorizable;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -29,11 +31,17 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
   protected $table = 'users';
   protected $fillable = [
-    'name', 'email', 'enrollment_number'
+    'name', 'email', 'password'
   ];
   protected $hidden = [
     'password',
+    'remember_token'
   ];
+
+  public function password(): Attribute
+  {
+    return Attribute::set(fn ($value) => Hash::make($value));
+  }
 
   public function getJWTIdentifier()
   {

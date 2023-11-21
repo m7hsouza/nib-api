@@ -22,4 +22,13 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->put('/{id}', 'ArticlesController@update');
     $router->delete('/{id}', 'ArticlesController@delete');
   });
+
+  $router->get('/users', 'UsersController@index');
+  $router->group(['prefix' => 'user'], function () use ($router) {
+    $router->get('/me', 'UsersController@me');
+    $router->get('/{id}', 'UsersController@show');
+    $router->post('/', 'UsersController@store');
+    $router->put('/{id}', 'UsersController@update');
+    $router->delete('/{id}', 'UsersController@delete');
+  });
 });
