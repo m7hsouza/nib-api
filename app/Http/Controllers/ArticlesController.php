@@ -12,6 +12,10 @@ class ArticlesController extends Controller
   public function __construct()
   {
     $this->middleware('auth:api');
+    $this->middleware('permission:create article', ['only' => 'store']);
+    $this->middleware('permission:read article', ['only' => ['index', 'show']]);
+    $this->middleware('permission:update article', ['only' => 'update']);
+    $this->middleware('permission:delete article', ['only' => 'delete']);
   }
 
   public function index(): JsonResponse

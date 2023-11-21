@@ -62,6 +62,7 @@ $app->singleton(
 $app->configure('app');
 $app->configure('jwt');
 $app->configure('tinker');
+$app->configure('permission');
 
 /*
 |--------------------------------------------------------------------------
@@ -80,6 +81,9 @@ $app->configure('tinker');
 
 $app->routeMiddleware([
   'auth' => App\Http\Middleware\Authenticate::class,
+  'can' => Illuminate\Auth\Middleware\Authorize::class,
+  'permission' => App\Http\Middleware\PermissionMiddleware::class,
+  'role'       => App\Http\Middleware\RoleMiddleware::class,
 ]);
 
 /*
@@ -94,10 +98,13 @@ $app->routeMiddleware([
 */
 
 $app->register(App\Providers\AuthServiceProvider::class);
-$app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 $app->register(\Laravel\Tinker\TinkerServiceProvider::class);
+$app->register(Spatie\Permission\PermissionServiceProvider::class);
+$app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
+
+$app->alias('cache', \Illuminate\Cache\CacheManager::class);
 
 /*
 |--------------------------------------------------------------------------
