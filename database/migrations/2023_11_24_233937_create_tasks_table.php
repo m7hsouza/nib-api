@@ -18,6 +18,7 @@ return new class extends Migration {
       $table->unsignedDouble('grade')->nullable();
       $table->string('observation')->nullable();
       $table->timestamps();
+      $table->softDeletes();
 
       $table->foreign('schedule_id')->references('id')->on('schedules');
       $table->foreign('responsible_id')->references('id')->on('users');

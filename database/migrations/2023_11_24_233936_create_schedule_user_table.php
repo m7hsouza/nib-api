@@ -10,11 +10,9 @@ return new class extends Migration {
    */
   public function up(): void
   {
-    Schema::create('schedules_users', function (Blueprint $table) {
-      $table->id();
+    Schema::create('schedule_user', function (Blueprint $table) {
       $table->unsignedBigInteger('leader_id');
       $table->unsignedBigInteger('schedule_id');
-      $table->timestamps();
 
       $table->foreign('leader_id')->references('id')->on('users');
       $table->foreign('schedule_id')->references('id')->on('schedules');
@@ -26,10 +24,10 @@ return new class extends Migration {
    */
   public function down(): void
   {
-    Schema::table('schedules_users', function (Blueprint $table) {
+    Schema::table('schedule_user', function (Blueprint $table) {
       $table->dropForeign(['leader_id']);
       $table->dropForeign(['schedule_id']);
     });
-    Schema::dropIfExists('schedules_users');
+    Schema::dropIfExists('schedule_user');
   }
 };

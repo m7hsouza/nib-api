@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\{Request, JsonResponse};
 use Symfony\Component\HttpFoundation\Response;
 
 class ArticlesController extends Controller
@@ -12,10 +11,10 @@ class ArticlesController extends Controller
   public function __construct()
   {
     $this->middleware('auth:api');
-    $this->middleware('permission:create article', ['only' => 'store']);
-    $this->middleware('permission:read article', ['only' => ['index', 'show']]);
-    $this->middleware('permission:update article', ['only' => 'update']);
-    $this->middleware('permission:delete article', ['only' => 'delete']);
+    $this->middleware('permission:article.create', ['only' => 'store']);
+    $this->middleware('permission:article.read', ['only' => ['index', 'show']]);
+    $this->middleware('permission:article.update', ['only' => 'update']);
+    $this->middleware('permission:article.delete', ['only' => 'delete']);
   }
 
   public function index(): JsonResponse
@@ -32,10 +31,7 @@ class ArticlesController extends Controller
 
   public function show($id)
   {
-    $article = Article::find($id);
-    if (!$article) {
-      return response()->json(['message' => 'Article not found!'], Response::HTTP_NOT_FOUND);
-    }
+    $article = Article::findOrFail($id);
     return response()->json($article);
   }
 
@@ -47,7 +43,6 @@ class ArticlesController extends Controller
       'image_url' => ['required', 'string'],
       'is_highlighted' => ['boolean']
     ]);
-
     $article = Article::create($request->only('title', 'content', 'image_url', 'is_highlighted'));
     $article->refresh();
     return response()->json($article, Response::HTTP_CREATED);
@@ -62,23 +57,15 @@ class ArticlesController extends Controller
       'is_highlighted' => 'boolean'
     ]);
 
-    $article = Article::find($id);
-    if (!$article) {
-      return response()->json(['message' => 'Article not found!'], Response::HTTP_NOT_FOUND);
-    }
-
+    $article = Article::findOrFail($id);
     $article->update($request->only('title', 'content', 'image_url', 'is_highlighted'));
     return response()->json($article);
   }
 
   public function delete($id)
   {
-    $article = Article::find($id);
-    if (!$article) {
-      return response()->json(['message' => 'Article not found!'], Response::HTTP_NOT_FOUND);
-    }
+    $article = Article::findOrFail($id);
     $article->delete();
     return response()->json(status: Response::HTTP_NO_CONTENT);
   }
-
 }

@@ -11,27 +11,34 @@ class RoleAndPermissionTablesSeeder extends Seeder
 
   public function run(): void
   {
-    Permission::firstOrCreate(['name' => 'update article']);
-    Permission::firstOrCreate(['name' => 'create article']);
-    Permission::firstOrCreate(['name' => 'read article']);
-    Permission::firstOrCreate(['name' => 'delete article']);
+    Permission::firstOrCreate(['name' => 'article.update']);
+    Permission::firstOrCreate(['name' => 'article.create']);
+    Permission::firstOrCreate(['name' => 'article.read']);
+    Permission::firstOrCreate(['name' => 'article.delete']);
 
-    Permission::firstOrCreate(['name' => 'update user']);
-    Permission::firstOrCreate(['name' => 'create user']);
-    Permission::firstOrCreate(['name' => 'read user']);
-    Permission::firstOrCreate(['name' => 'delete user']);
+    Permission::firstOrCreate(['name' => 'user.update']);
+    Permission::firstOrCreate(['name' => 'user.create']);
+    Permission::firstOrCreate(['name' => 'user.read']);
+    Permission::firstOrCreate(['name' => 'user.delete']);
+
+    Permission::firstOrCreate(['name' => 'schedule.update']);
+    Permission::firstOrCreate(['name' => 'schedule.create']);
+    Permission::firstOrCreate(['name' => 'schedule.read']);
+    Permission::firstOrCreate(['name' => 'schedule.all']);
+    Permission::firstOrCreate(['name' => 'schedule.delete']);
 
     Role::firstOrCreate(["name" => "admin"])->syncPermissions([
-      'update article', 'create article', 'read article', 'delete article',
-      'update user', 'create user', 'read user'
+      'article.update', 'article.create', 'article.read', 'article.delete',
+      'user.update', 'user.create', 'user.read', 'user.delete',
+      'schedule.update', 'schedule.create', 'schedule.read', 'schedule.delete', 'schedule.all',
     ]);
 
     Role::firstOrCreate(["name" => "writer"])->syncPermissions([
-      'update article', 'create article', 'read article', 'delete article'
+      'article.update', 'article.create', 'article.read', 'article.delete'
     ]);
 
     Role::firstOrCreate(["name" => "user"])->syncPermissions([
-      'read article'
+      'article.read'
     ]);
 
     User::firstWhere('enrollment_number', '000000')->assignRole('admin');

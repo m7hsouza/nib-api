@@ -17,6 +17,7 @@ return new class extends Migration {
       $table->string('state', 30);
       $table->unsignedBigInteger('door_id');
       $table->timestamps();
+      $table->softDeletes();
 
       $table->foreign('door_id')->references('id')->on('doors');
     });

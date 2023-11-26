@@ -2,7 +2,8 @@
 
 namespace App\Enums;
 
-enum Shifts
+enum Shifts: string
 {
-
+  case FIRST = 'first';
+  case SECOND = 'second';
 }
