@@ -15,7 +15,8 @@ class UserTableSeeder extends Seeder
     $users = User::create([
       'name' => 'Admin',
       'email' => 'admin@nib.com',
-      'password' => 'nib@123456'
+      'password' => 'nib@123456',
+      'birth' => new \Datetime
     ]);
   }
 }

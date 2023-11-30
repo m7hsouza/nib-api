@@ -24,7 +24,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
   $router->get('/users', 'UsersController@index');
   $router->group(['prefix' => 'user'], function () use ($router) {
-    $router->get('/user-profile', 'UsersController@me');
+    $router->get('/me', 'UsersController@me');
+    $router->put('/me', 'UsersController@updateMyProfile');
+    $router->patch('/me/update-avatar', 'UsersController@updateAvatar');
     $router->get('/{id}', 'UsersController@show');
     $router->post('/', 'UsersController@store');
     $router->put('/{id}', 'UsersController@update');

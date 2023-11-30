@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Ramsey\Uuid\Uuid;
 use Illuminate\Http\{Request, JsonResponse};
 use Symfony\Component\HttpFoundation\Response;
 
@@ -35,14 +36,70 @@ class UsersController extends Controller
     return response()->json(auth()->user());
   }
 
+  public function updateMyProfile(Request $request): JsonResponse
+  {
+    $user = auth()->user();
+    $this->validate($request, [
+      'name' => 'string',
+      'email' => 'string',
+      'password' => 'string',
+      'phone' => 'string',
+      'birth' => 'date',
+      'gender' => 'in:male,female',
+      'is_already_baptized' => 'bool',
+      'already_accepted_term' => 'bool',
+    ]);
+    $itDifferentEmail = $request->email && $user->email !== $request->email;
+    if ($itDifferentEmail && User::whereEmail($request->email)->exists) {
+      return response()->json(['message' => 'Email already exists'], Response::HTTP_CONFLICT);
+    }
+    $user->update($request->only(
+      'name',
+      'email',
+      'password',
+      'phone',
+      'birth',
+      'gender',
+      'is_already_baptized',
+      'already_accepted_term',
+    ));
+    return response()->json($user);
+
+  }
+
+  public function updateAvatar(Request $request): JsonResponse
+  {
+    $this->validate($request, [
+      'avatar' => 'required|mimes:jpg,png,jpeg',
+    ]);
+    $filename = Uuid::uuid4()->toString() . '.' . $request->file('image')->getClientOriginalExtension();
+    $request->file('avatar')->move(base_path('public/uploads/users'), $filename);
+    $user = auth()->user()->update(['avatar_url' => "uploads/users/$filename"]);
+    return response()->json($user);
+  }
+
   public function store(Request $request): JsonResponse
   {
     $this->validate($request, [
       'name' => ['required', 'string'],
       'email' => ['required', 'string', 'unique:users,email'],
       'password' => ['required', 'string'],
+      'phone' => 'string',
+      'birth' => ['required', 'date'],
+      'gender' => ['required', 'in:male,female'],
+      'is_already_baptized' => ['required', 'bool'],
+      'already_accepted_term' => ['required', 'bool'],
     ]);
-    $user = User::create($request->only('name', 'email', 'password'));
+    $user = User::create($request->only(
+      'name',
+      'email',
+      'password',
+      'phone',
+      'birth',
+      'gender',
+      'is_already_baptized',
+      'already_accepted_term',
+    ));
     $user->refresh();
     return response()->json($user, Response::HTTP_CREATED);
   }
@@ -53,6 +110,11 @@ class UsersController extends Controller
       'name' => 'string',
       'email' => 'string',
       'password' => 'string',
+      'phone' => 'string',
+      'birth' => 'date',
+      'gender' => 'in:male,female',
+      'is_already_baptized' => 'bool',
+      'already_accepted_term' => 'bool',
       'password_change_required' => 'boolean'
     ]);
     $user = User::findOrFail($id);
@@ -60,7 +122,17 @@ class UsersController extends Controller
     if ($itDifferentEmail && User::whereEmail($request->email)->exists) {
       return response()->json(['message' => 'Email already exists'], Response::HTTP_CONFLICT);
     }
-    $user->update($request->only('name', 'email', 'password'));
+    $user->update($request->only(
+      'name',
+      'email',
+      'password',
+      'phone',
+      'birth',
+      'gender',
+      'is_already_baptized',
+      'already_accepted_term',
+      'password_change_required'
+    ));
     return response()->json($user);
   }
 
