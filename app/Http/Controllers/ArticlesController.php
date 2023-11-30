@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use Ramsey\Uuid\Uuid;
 use Illuminate\Http\{Request, JsonResponse};
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,13 +20,13 @@ class ArticlesController extends Controller
 
   public function index(): JsonResponse
   {
-    $articles = Article::paginate(10);
+    $articles = Article::with('author:id,name,avatar_url')->orderByDesc('updated_at')->cursorPaginate(10);
     return response()->json($articles);
   }
 
   public function highlights()
   {
-    $articles = Article::where('is_highlighted', true)->orderByDesc('created_at')->get();
+    $articles = Article::with('author:id,name,avatar_url')->where('is_highlighted', true)->orderByDesc('updated_at')->get();
     return response()->json($articles);
   }
 
@@ -40,10 +41,13 @@ class ArticlesController extends Controller
     $this->validate($request, [
       'title' => ['required', 'string'],
       'content' => ['required', 'string'],
-      'image_url' => ['required', 'string'],
+      'image' => ['required', 'file'],
       'is_highlighted' => ['boolean']
     ]);
-    $article = Article::create($request->only('title', 'content', 'image_url', 'is_highlighted'));
+    $filename = Uuid::uuid4()->toString() . '.' . $request->file('image')->getClientOriginalExtension();
+    $request->file('image')->move(base_path('public/uploads/articles'), $filename);
+    $request->merge(['path' => "uploads/articles/$filename"]);
+    $article = Article::create($request->only('title', 'content', 'path', 'is_highlighted'));
     $article->refresh();
     return response()->json($article, Response::HTTP_CREATED);
   }

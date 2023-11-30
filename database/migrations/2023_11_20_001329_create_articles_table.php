@@ -16,7 +16,7 @@ return new class extends Migration {
       $table->string('content');
       $table->unsignedBigInteger('author_id');
       $table->boolean('is_highlighted')->default(false);
-      $table->string('image_url');
+      $table->string('path');
       $table->softDeletes();
       $table->timestamps();
 
