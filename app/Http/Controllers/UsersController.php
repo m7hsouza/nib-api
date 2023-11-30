@@ -39,11 +39,12 @@ class UsersController extends Controller
   public function updateMyProfile(Request $request): JsonResponse
   {
     $user = auth()->user();
+    $request->merge(['phone' => preg_replace('/\D/', '', $request->phone)]);
     $this->validate($request, [
       'name' => 'string',
       'email' => 'string',
       'password' => 'string',
-      'phone' => 'string',
+      'phone' => 'string|regex:/\d{11}/',
       'birth' => 'date',
       'gender' => 'in:male,female',
       'is_already_baptized' => 'bool',
@@ -72,10 +73,11 @@ class UsersController extends Controller
     $this->validate($request, [
       'avatar' => 'required|mimes:jpg,png,jpeg',
     ]);
-    $filename = Uuid::uuid4()->toString() . '.' . $request->file('image')->getClientOriginalExtension();
-    $request->file('avatar')->move(base_path('public/uploads/users'), $filename);
-    $user = auth()->user()->update(['avatar_url' => "uploads/users/$filename"]);
-    return response()->json($user);
+    $file = $request->file('avatar');
+    $filename = Uuid::uuid4()->toString() . '.' . $file->getClientOriginalExtension();
+    $file->move(base_path('public/uploads/users'), $filename);
+    auth()->user()->update(['avatar_url' => "uploads/users/$filename"]);
+    return response()->json(auth()->user());
   }
 
   public function store(Request $request): JsonResponse
@@ -84,7 +86,7 @@ class UsersController extends Controller
       'name' => ['required', 'string'],
       'email' => ['required', 'string', 'unique:users,email'],
       'password' => ['required', 'string'],
-      'phone' => 'string',
+      'phone' => 'string|regex:/\d{11}/',
       'birth' => ['required', 'date'],
       'gender' => ['required', 'in:male,female'],
       'is_already_baptized' => ['required', 'bool'],
@@ -110,7 +112,7 @@ class UsersController extends Controller
       'name' => 'string',
       'email' => 'string',
       'password' => 'string',
-      'phone' => 'string',
+      'phone' => 'string|regex:/\d{11}/',
       'birth' => 'date',
       'gender' => 'in:male,female',
       'is_already_baptized' => 'bool',
