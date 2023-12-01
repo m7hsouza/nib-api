@@ -46,8 +46,10 @@ class ArticlesController extends Controller
     ]);
     $filename = Uuid::uuid4()->toString() . '.' . $request->file('image')->getClientOriginalExtension();
     $request->file('image')->move(base_path('public/uploads/articles'), $filename);
-    $request->merge(['path' => "uploads/articles/$filename"]);
-    $article = Article::create($request->only('title', 'content', 'path', 'is_highlighted'));
+    $article = Article::create([
+      'image_url' => "/uploads/articles/$filename",
+      ...$request->only('title', 'content', 'is_highlighted'),
+    ]);
     $article->refresh();
     return response()->json($article, Response::HTTP_CREATED);
   }
@@ -57,12 +59,10 @@ class ArticlesController extends Controller
     $this->validate($request, [
       'title' => 'string',
       'content' => 'string',
-      'image_url' => 'url',
       'is_highlighted' => 'boolean'
     ]);
-
     $article = Article::findOrFail($id);
-    $article->update($request->only('title', 'content', 'image_url', 'is_highlighted'));
+    $article->update($request->only('title', 'content', 'is_highlighted'));
     return response()->json($article);
   }
 

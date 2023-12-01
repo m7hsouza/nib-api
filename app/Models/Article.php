@@ -25,6 +25,9 @@ class Article extends Model implements AuthorizableContract
   protected static function boot(): void
   {
     parent::boot();
+    self::retrieved(function (Article $article) {
+      $article->image_url = env('APP_URL') . $article->image_url;
+    });
     self::creating(function (Article $article) {
       $article->author_id = auth()->id();
       return $article;
