@@ -13,7 +13,7 @@ return new class extends Migration {
     Schema::create('articles', function (Blueprint $table) {
       $table->id();
       $table->string('title');
-      $table->string('content');
+      $table->longText('content');
       $table->unsignedBigInteger('author_id');
       $table->boolean('is_highlighted')->default(false);
       $table->string('image_url');

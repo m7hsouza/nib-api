@@ -21,7 +21,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
   {
     parent::boot();
     self::retrieved(function (User $user) {
-      $user->avatar_url = env('APP_URL') . $user->avatar_url;
+      if ($avatarUrl = $user->avatar_url) {
+        $user->avatar_url = env('APP_URL') . $avatarUrl;
+      }
     });
 
     self::creating(function (User $user) {

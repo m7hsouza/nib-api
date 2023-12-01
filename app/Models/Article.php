@@ -15,7 +15,7 @@ class Article extends Model implements AuthorizableContract
 
   protected $table = 'articles';
   protected $fillable = [
-    'title', 'content', 'path', 'is_highlighted'
+    'title', 'content', 'image_url', 'is_highlighted'
   ];
 
   protected $hidden = [
