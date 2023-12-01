@@ -32,6 +32,9 @@ class Article extends Model implements AuthorizableContract
       $article->author_id = auth()->id();
       return $article;
     });
+    self::updating(function (Article $article) {
+      $article->image_url = str_replace(env('APP_URL'), '', $article->image_url);
+    });
   }
 
   public function author(): BelongsTo

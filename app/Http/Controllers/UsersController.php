@@ -76,7 +76,7 @@ class UsersController extends Controller
     $file = $request->file('avatar');
     $filename = Uuid::uuid4()->toString() . '.' . $file->getClientOriginalExtension();
     $file->move(base_path('public/uploads/users'), $filename);
-    auth()->user()->update(['avatar_url' => "uploads/users/$filename"]);
+    auth()->user()->update(['avatar_url' => "/uploads/users/$filename"]);
     return response()->json(auth()->user());
   }
 
