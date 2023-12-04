@@ -20,9 +20,9 @@ class Video extends Model implements AuthorizableContract
   protected static function boot(): void
   {
     parent::boot();
-//    self::retrieved(function (Article $article) {
-//      $article->image_url = env('APP_URL') . $article->image_url;
-//    });
+    self::retrieved(function (Video $video) {
+      $video->file_url = route('video.file', [$video->id]);
+    });
     self::creating(function (Video $video) {
       $video->user_id = auth()->id();
       return $video;

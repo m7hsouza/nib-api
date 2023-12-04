@@ -20,9 +20,9 @@ class Card extends Model implements AuthorizableContract
   protected static function boot(): void
   {
     parent::boot();
-//    self::retrieved(function (Card $article) {
-//      $article->image_url = env('APP_URL') . $article->image_url;
-//    });
+    self::retrieved(function (Card $card) {
+      $card->image_url = route('card.image', [$card->id]);
+    });
     self::creating(function (Card $card) {
       $card->user_id = auth()->id();
       return $card;

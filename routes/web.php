@@ -16,7 +16,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
   $router->get('/articles', 'ArticlesController@index');
   $router->group(['prefix' => 'article'], function () use ($router) {
     $router->get('/{article_id}', 'ArticlesController@show');
-    $router->get('/{article_id}/image', 'ArticlesController@image');
+    $router->get('/{article_id}/image', ['as' => 'article.image', 'uses' => 'ArticlesController@image']);
 
     $router->post('/', 'ArticlesController@store');
     $router->put('/{article_id}', 'ArticlesController@update');
@@ -26,7 +26,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
   $router->get('/videos', 'VideosController@index');
   $router->group(['prefix' => 'video'], function () use ($router) {
     $router->get('/{video_id}', 'VideosController@show');
-    $router->get('/{video_id}/file', 'VideosController@file');
+    $router->get('/{video_id}/file', ['as' => 'video.file', 'uses' => 'VideosController@file']);
     $router->post('/', 'VideosController@store');
     $router->put('/{video_id}', 'VideosController@update');
     $router->delete('/{video_id}', 'VideosController@delete');
@@ -35,7 +35,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
   $router->get('/cards', 'CardsController@index');
   $router->group(['prefix' => 'card'], function () use ($router) {
     $router->get('/{card_id}', 'CardsController@show');
-    $router->get('/{card_id}/image', 'CardsController@image');
+    $router->get('/{card_id}/image', ['as' => 'card.image', 'uses' => 'CardsController@image']);
+
     $router->post('/', 'CardsController@store');
     $router->put('/{card_id}', 'CardsController@update');
     $router->delete('/{card_id}', 'CardsController@delete');
@@ -45,7 +46,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
   $router->group(['prefix' => 'user'], function () use ($router) {
     $router->get('/me', 'UsersController@me');
     $router->get('/{user_id}', 'UsersController@show');
-    $router->get('/{user_id}/avatar', 'UsersController@getAvatar');
+    $router->get('/{user_id}/avatar', ['as' => 'user.avatar', 'uses' => 'UsersController@getAvatar']);
 
     $router->post('/', 'UsersController@store');
     $router->post('/me/update-avatar', 'UsersController@updateAvatar');

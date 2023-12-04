@@ -22,11 +22,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
   {
     parent::boot();
     self::retrieved(function (User $user) {
-      if ($avatarUrl = $user->avatar_url) {
-        $user->avatar_url = env('APP_URL') . $avatarUrl;
-      }
+      $user->avatar_url = route('user.avatar', [$user->id]);
     });
-
     self::creating(function (User $user) {
       ['enrollment_number' => $lastEnrollmentNumber] = User::select('enrollment_number')->orderByDesc('id')->first();
       $enrollment_number = $lastEnrollmentNumber ? ++$lastEnrollmentNumber : 0;
