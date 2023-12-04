@@ -9,12 +9,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
 
-class Article extends Model implements AuthorizableContract
+class Video extends Model implements AuthorizableContract
 {
   use Authorizable, SoftDeletes;
 
   protected $table = 'articles';
-  protected $fillable = ['title', 'content', 'filename', 'likes'];
+  protected $fillable = ['title', 'description', 'filename', 'likes'];
   protected $hidden = ['deleted_at', 'filename'];
 
   protected static function boot(): void
@@ -23,13 +23,13 @@ class Article extends Model implements AuthorizableContract
 //    self::retrieved(function (Article $article) {
 //      $article->image_url = env('APP_URL') . $article->image_url;
 //    });
-    self::creating(function (Article $article) {
-      $article->author_id = auth()->id();
-      return $article;
+    self::creating(function (Video $video) {
+      $video->user_id = auth()->id();
+      return $video;
     });
   }
 
-  public function author(): BelongsTo
+  public function user(): BelongsTo
   {
     return $this->belongsTo(User::class);
   }

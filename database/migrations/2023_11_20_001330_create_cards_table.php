@@ -10,17 +10,15 @@ return new class extends Migration {
    */
   public function up(): void
   {
-    Schema::create('articles', function (Blueprint $table) {
+    Schema::create('cards', function (Blueprint $table) {
       $table->id();
       $table->string('title');
-      $table->longText('content');
-      $table->unsignedInteger('likes')->default(0);
-      $table->unsignedBigInteger('author_id');
+      $table->unsignedBigInteger('user_id');
       $table->string('filename');
       $table->softDeletes();
       $table->timestamps();
 
-      $table->foreign('author_id')->references('id')->on('users');
+      $table->foreign('user_id')->references('id')->on('users');
     });
   }
 
@@ -29,9 +27,9 @@ return new class extends Migration {
    */
   public function down(): void
   {
-    Schema::table('articles', function (Blueprint $table) {
-      $table->dropForeign(['author_id']);
+    Schema::table('cards', function (Blueprint $table) {
+      $table->dropForeign(['user_id']);
     });
-    Schema::dropIfExists('articles');
+    Schema::dropIfExists('cards');
   }
 };

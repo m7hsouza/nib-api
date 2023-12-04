@@ -15,11 +15,30 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
   $router->get('/articles', 'ArticlesController@index');
   $router->group(['prefix' => 'article'], function () use ($router) {
-    $router->get('/highlights', 'ArticlesController@highlights');
-    $router->get('/{id}', 'ArticlesController@show');
+    $router->get('/{article_id}', 'ArticlesController@show');
+    $router->get('/{article_id}/image', 'ArticlesController@image');
+
     $router->post('/', 'ArticlesController@store');
-    $router->put('/{id}', 'ArticlesController@update');
-    $router->delete('/{id}', 'ArticlesController@delete');
+    $router->put('/{article_id}', 'ArticlesController@update');
+    $router->delete('/{article_id}', 'ArticlesController@delete');
+  });
+
+  $router->get('/videos', 'VideosController@index');
+  $router->group(['prefix' => 'video'], function () use ($router) {
+    $router->get('/{video_id}', 'VideosController@show');
+    $router->get('/{video_id}/file', 'VideosController@file');
+    $router->post('/', 'VideosController@store');
+    $router->put('/{video_id}', 'VideosController@update');
+    $router->delete('/{video_id}', 'VideosController@delete');
+  });
+
+  $router->get('/cards', 'CardsController@index');
+  $router->group(['prefix' => 'card'], function () use ($router) {
+    $router->get('/{card_id}', 'CardsController@show');
+    $router->get('/{card_id}/image', 'CardsController@image');
+    $router->post('/', 'CardsController@store');
+    $router->put('/{card_id}', 'CardsController@update');
+    $router->delete('/{card_id}', 'CardsController@delete');
   });
 
   $router->get('/users', 'UsersController@index');

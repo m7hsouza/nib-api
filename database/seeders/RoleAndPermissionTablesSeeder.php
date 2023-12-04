@@ -16,6 +16,11 @@ class RoleAndPermissionTablesSeeder extends Seeder
     Permission::firstOrCreate(['name' => 'article.read']);
     Permission::firstOrCreate(['name' => 'article.delete']);
 
+    Permission::firstOrCreate(['name' => 'video.update']);
+    Permission::firstOrCreate(['name' => 'video.create']);
+    Permission::firstOrCreate(['name' => 'video.read']);
+    Permission::firstOrCreate(['name' => 'video.delete']);
+
     Permission::firstOrCreate(['name' => 'user.update']);
     Permission::firstOrCreate(['name' => 'user.create']);
     Permission::firstOrCreate(['name' => 'user.read']);
@@ -30,15 +35,17 @@ class RoleAndPermissionTablesSeeder extends Seeder
     Role::firstOrCreate(["name" => "admin"])->syncPermissions([
       'article.update', 'article.create', 'article.read', 'article.delete',
       'user.update', 'user.create', 'user.read', 'user.delete',
+      'video.update', 'video.create', 'video.read', 'video.delete',
       'schedule.update', 'schedule.create', 'schedule.read', 'schedule.delete', 'schedule.all',
     ]);
 
     Role::firstOrCreate(["name" => "writer"])->syncPermissions([
-      'article.update', 'article.create', 'article.read', 'article.delete'
+      'article.update', 'article.create', 'article.read', 'article.delete',
+      'video.update', 'video.create', 'video.read', 'video.delete',
     ]);
 
     Role::firstOrCreate(["name" => "user"])->syncPermissions([
-      'article.read'
+      'article.read', 'video.read'
     ]);
 
     User::firstWhere('enrollment_number', '000000')->assignRole('admin');

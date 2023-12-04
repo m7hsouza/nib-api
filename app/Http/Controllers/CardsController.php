@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Article;
+use App\Models\Card;
 use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Http\{Request, JsonResponse};
 use Symfony\Component\HttpFoundation\Response;
 
-class ArticlesController extends Controller
+class CardsController extends Controller
 {
   public function __construct()
   {
@@ -21,14 +21,14 @@ class ArticlesController extends Controller
 
   public function index(): JsonResponse
   {
-    $articles = Article::with('author:id,name,avatar_url')->orderByDesc('updated_at')->cursorPaginate(10);
+    $articles = Card::orderByDesc('updated_at')->cursorPaginate(10);
     return response()->json($articles);
   }
 
-  public function show($article_id)
+  public function show($card_id)
   {
-    $article = Article::findOrFail($article_id);
-    return response()->json($article);
+    $card = Card::findOrFail($card_id);
+    return response()->json($card);
   }
 
   public function store(Request $request): JsonResponse
@@ -37,12 +37,10 @@ class ArticlesController extends Controller
       $request,
       [
         'title' => 'required|string',
-        'content' => 'required|string',
         'image' => 'required|mimes:jpg,png,jpeg',
       ],
       [
         'title.required' => 'O titulo é obrigatório',
-        'content.required' => 'A descrição é obrigatória',
         'image' => [
           'required' => 'O arquivo é obrigatório.',
           'mimes' => 'Formato do arquivo inválido.'
@@ -52,35 +50,32 @@ class ArticlesController extends Controller
     $file = $request->file('image');
     $filename = Uuid::uuid4()->toString() . '.' . $file->getClientOriginalExtension();
     Storage::disk('article')->put($filename, $file->getContent());
-    $article = Article::create([
+    $card = Article::create([
       ...compact('filename'),
-      ...$request->only('title', 'content'),
+      ...$request->only('title'),
     ]);
-    $article->refresh();
-    return response()->json($article, Response::HTTP_CREATED);
+    $card->refresh();
+    return response()->json($card, Response::HTTP_CREATED);
   }
 
-  public function update(Request $request, $article_id)
+  public function update(Request $request, $card_id)
   {
-    $this->validate($request, [
-      'title' => 'string',
-      'content' => 'string',
-    ]);
-    $article = Article::findOrFail($article_id);
-    $article->update($request->only('title', 'content'));
-    return response()->json($article);
+    $this->validate($request, ['title' => 'string']);
+    $card = Card::findOrFail($card_id);
+    $card->update($request->only('title'));
+    return response()->json($card);
   }
 
-  public function delete($article_id)
+  public function delete($card_id)
   {
-    $article = Article::findOrFail($article_id);
-    $article->delete();
+    $card = Card::findOrFail($card_id);
+    $card->delete();
     return response()->json(status: Response::HTTP_NO_CONTENT);
   }
 
-  public function image($article_id)
+  public function image($card_id)
   {
-    $article = Article::select('filename')->findOrFail($article_id);
-    return response()->file(Storage::disk('article')->path($article->filename));
+    $card = Card::select('filename')->findOrFail($card_id);
+    return response()->file(Storage::disk('article')->path($card->filename));
   }
 }
