@@ -25,12 +25,16 @@ $router->group(['prefix' => 'api'], function () use ($router) {
   $router->get('/users', 'UsersController@index');
   $router->group(['prefix' => 'user'], function () use ($router) {
     $router->get('/me', 'UsersController@me');
-    $router->put('/me', 'UsersController@updateMyProfile');
-    $router->post('/me/update-avatar', 'UsersController@updateAvatar');
-    $router->get('/{id}', 'UsersController@show');
+    $router->get('/{user_id}', 'UsersController@show');
+    $router->get('/{user_id}/avatar', 'UsersController@getAvatar');
+
     $router->post('/', 'UsersController@store');
-    $router->put('/{id}', 'UsersController@update');
-    $router->delete('/{id}', 'UsersController@delete');
+    $router->post('/me/update-avatar', 'UsersController@updateAvatar');
+
+    $router->put('/me', 'UsersController@updateMyProfile');
+    $router->put('/{user_id}', 'UsersController@update');
+
+    $router->delete('/{user_id}', 'UsersController@delete');
   });
 
   $router->get('/schedules', 'SchedulesController@index');

@@ -14,9 +14,10 @@ return new class extends Migration {
       $table->id();
       $table->string('title');
       $table->longText('content');
+      $table->unsignedInteger('likes')->default(0);
       $table->unsignedBigInteger('author_id');
       $table->boolean('is_highlighted')->default(false);
-      $table->string('image_url');
+      $table->string('filename');
       $table->softDeletes();
       $table->timestamps();
 

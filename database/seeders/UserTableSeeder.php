@@ -16,7 +16,8 @@ class UserTableSeeder extends Seeder
       'name' => 'Admin',
       'email' => 'admin@nib.com',
       'password' => 'nib@123456',
-      'birth' => new \Datetime
+      'birth' => '2000-01-01',
+      'is_active' => true,
     ]);
   }
 }

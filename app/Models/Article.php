@@ -15,11 +15,12 @@ class Article extends Model implements AuthorizableContract
 
   protected $table = 'articles';
   protected $fillable = [
-    'title', 'content', 'image_url', 'is_highlighted'
+    'title', 'content', 'is_highlighted', 'likes'
   ];
 
   protected $hidden = [
     'deleted_at',
+    'image_path'
   ];
 
   protected static function boot(): void
@@ -32,9 +33,9 @@ class Article extends Model implements AuthorizableContract
       $article->author_id = auth()->id();
       return $article;
     });
-    self::updating(function (Article $article) {
-      $article->image_url = str_replace(env('APP_URL'), '', $article->image_url);
-    });
+    // self::updating(function (Article $article) {
+    //  $article->image_url = str_replace(env('APP_URL'), '', $article->image_url);
+    // });
   }
 
   public function author(): BelongsTo

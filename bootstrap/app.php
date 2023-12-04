@@ -63,6 +63,7 @@ $app->configure('app');
 $app->configure('jwt');
 $app->configure('tinker');
 $app->configure('permission');
+$app->configure('filesystems');
 
 /*
 |--------------------------------------------------------------------------

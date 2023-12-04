@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
+
 use  App\Models\User;
 
 class AuthController extends Controller
@@ -15,15 +17,30 @@ class AuthController extends Controller
 
   public function login(Request $request)
   {
-    $this->validate($request, [
-      'enrollment_number' => 'required|string',
-      'password' => 'required|string',
-    ]);
+    $this->validate(
+      $request,
+      [
+        'enrollment_number' => 'required|string|digits:6',
+        'password' => 'required|string',
+      ],
+      [
+        'password.required' => 'A senha é obrigatória.',
+        'enrollment_number' => [
+          'required' => 'A matrícula é obrigatória.',
+          'digits' => 'Matrícula no formato inválido.'
+        ]
+      ]
+    );
+
+    $user = User::active()->whereEnrollmentNumber($request->enrollment_number)->first();
+    if (!$user) {
+      return response()->json(['message' => 'Matrícula ou senha inválida.'], Response::HTTP_UNAUTHORIZED);
+    }
 
     $credentials = $request->only(['enrollment_number', 'password']);
 
-    if (! $token = Auth::attempt($credentials)) {
-      return response()->json(['message' => 'Unauthorized'], 401);
+    if (!$token = Auth::attempt($credentials)) {
+      return response()->json(['message' => 'Matrícula ou senha inválida.'], Response::HTTP_UNAUTHORIZED);
     }
 
     return $this->respondWithToken($token);

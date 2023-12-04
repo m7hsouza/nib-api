@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Builder;
 use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Traits\HasRoles;
@@ -36,14 +37,20 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
   protected $table = 'users';
   protected $fillable = [
-    'name', 'email', 'password', 'avatar_url', 'phone', 'birth', 'gender',
-    'state', 'password_change_required', 'is_already_baptized', 'already_accepted_term'
+    'name', 'email', 'phone', 'birth', 'gender', 'password', 'avatar_filename',
+    'is_active', 'password_change_required', 'is_already_baptized', 'already_accepted_term'
   ];
   protected $hidden = [
     'password',
     'remember_token',
-    'email_verified_at'
+    'email_verified_at',
+    'avatar_filename'
   ];
+
+  public function scopeActive(Builder $query): void
+  {
+    $query->where('is_active', true);
+  }
 
   public function password(): Attribute
   {

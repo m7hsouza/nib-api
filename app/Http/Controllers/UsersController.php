@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Http\{Request, JsonResponse};
 use Symfony\Component\HttpFoundation\Response;
@@ -25,9 +26,9 @@ class UsersController extends Controller
     return response()->json($users);
   }
 
-  public function show($id): JsonResponse
+  public function show($user_id): JsonResponse
   {
-    $user = User::findOrFail($id);
+    $user = User::findOrFail($user_id);
     return response()->json($user);
   }
 
@@ -42,16 +43,17 @@ class UsersController extends Controller
     $request->merge(['phone' => preg_replace('/\D/', '', $request->phone)]);
     $this->validate($request, [
       'name' => 'string',
-      'email' => 'string',
-      'password' => 'string',
+      'email' => 'string|email',
+      'password' => 'string|min:8',
       'phone' => 'string|regex:/\d{11}/',
-      'birth' => 'date',
+      'birth' => 'date|date_format:Y-m-d',
       'gender' => 'in:male,female',
-      'is_already_baptized' => 'bool',
-      'already_accepted_term' => 'bool',
+      'is_already_baptized' => 'boolean',
+      'already_accepted_term' => 'boolean',
+      'is_active' => 'boolean'
     ]);
     $itDifferentEmail = $request->email && $user->email !== $request->email;
-    if ($itDifferentEmail && User::whereEmail($request->email)->exists) {
+    if ($itDifferentEmail && User::whereEmail($request->email)->exists()) {
       return response()->json(['message' => 'Email already exists'], Response::HTTP_CONFLICT);
     }
     $user->update($request->only(
@@ -63,6 +65,7 @@ class UsersController extends Controller
       'gender',
       'is_already_baptized',
       'already_accepted_term',
+      'is_active'
     ));
     return response()->json($user);
 
@@ -70,27 +73,51 @@ class UsersController extends Controller
 
   public function updateAvatar(Request $request): JsonResponse
   {
-    $this->validate($request, [
-      'avatar' => 'required|mimes:jpg,png,jpeg',
-    ]);
+    $this->validate(
+      $request,
+      [
+        'avatar' => 'required|mimes:jpg,png,jpeg',
+      ],
+      [
+        'avatar' => [
+          'required' => 'O arquivo é obrigatório.',
+          'mimes' => 'Formato do arquivo inválido.'
+        ]
+      ]
+    );
     $file = $request->file('avatar');
-    $filename = Uuid::uuid4()->toString() . '.' . $file->getClientOriginalExtension();
-    $file->move(base_path('public/uploads/users'), $filename);
-    auth()->user()->update(['avatar_url' => "/uploads/users/$filename"]);
+    $avatar_filename = Uuid::uuid4()->toString() . '.' . $file->getClientOriginalExtension();
+    $avatarDisk = Storage::disk('avatar');
+    $avatarDisk->put($avatar_filename, $file->getContent());
+    $user = auth()->user();
+    $oldAvatarFilename = $user->avatar_filename;
+    $user->update(compact('avatar_filename'));
+    $user->refresh();
+    if ($oldAvatarFilename) {
+      $avatarDisk->delete($oldAvatarFilename);
+    }
     return response()->json(auth()->user());
+  }
+
+  public function getAvatar(Request $request, $user_id)
+  {
+    $user = User::select('avatar_filename')->findOrFail($user_id);
+    return response()->file(Storage::disk('avatar')->path($user->avatar_filename));
   }
 
   public function store(Request $request): JsonResponse
   {
+    $request->merge(['phone' => preg_replace('/\D/', '', $request->phone)]);
     $this->validate($request, [
       'name' => ['required', 'string'],
-      'email' => ['required', 'string', 'unique:users,email'],
-      'password' => ['required', 'string'],
+      'email' => ['required', 'string', 'email', 'unique:users,email'],
+      'password' => ['required', 'string', 'min:8'],
       'phone' => 'string|regex:/\d{11}/',
       'birth' => ['required', 'date'],
       'gender' => ['required', 'in:male,female'],
-      'is_already_baptized' => ['required', 'bool'],
-      'already_accepted_term' => ['required', 'bool'],
+      'is_already_baptized' => ['required', 'boolean'],
+      'already_accepted_term' => ['required', 'boolean'],
+      'is_active' => 'boolean'
     ]);
     $user = User::create($request->only(
       'name',
@@ -101,27 +128,29 @@ class UsersController extends Controller
       'gender',
       'is_already_baptized',
       'already_accepted_term',
+      'is_active'
     ));
     $user->refresh();
     return response()->json($user, Response::HTTP_CREATED);
   }
 
-  public function update(Request $request, $id): JsonResponse
+  public function update(Request $request, $user_id): JsonResponse
   {
     $this->validate($request, [
       'name' => 'string',
       'email' => 'string',
-      'password' => 'string',
+      'password' => 'string|min:8',
       'phone' => 'string|regex:/\d{11}/',
       'birth' => 'date',
       'gender' => 'in:male,female',
-      'is_already_baptized' => 'bool',
-      'already_accepted_term' => 'bool',
-      'password_change_required' => 'boolean'
+      'is_already_baptized' => 'boolean',
+      'already_accepted_term' => 'boolean',
+      'password_change_required' => 'boolean',
+      'is_active' => 'boolean'
     ]);
-    $user = User::findOrFail($id);
+    $user = User::findOrFail($user_id);
     $itDifferentEmail = $request->email && $user->email !== $request->email;
-    if ($itDifferentEmail && User::whereEmail($request->email)->exists) {
+    if ($itDifferentEmail && User::whereEmail($request->email)->exists()) {
       return response()->json(['message' => 'Email already exists'], Response::HTTP_CONFLICT);
     }
     $user->update($request->only(
@@ -133,14 +162,15 @@ class UsersController extends Controller
       'gender',
       'is_already_baptized',
       'already_accepted_term',
-      'password_change_required'
+      'password_change_required',
+      'is_active'
     ));
     return response()->json($user);
   }
 
-  public function delete($id): JsonResponse
+  public function delete($user_id): JsonResponse
   {
-    $user = User::findOrFail($id);
+    $user = User::findOrFail($user_id);
     $user->delete();
     return response()->json(status: Response::HTTP_NO_CONTENT);
   }
