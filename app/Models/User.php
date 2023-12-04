@@ -18,20 +18,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 {
   use Authenticatable, Authorizable, HasFactory, HasRoles;
 
-  protected static function boot(): void
-  {
-    parent::boot();
-    self::retrieved(function (User $user) {
-      $user->avatar_url = route('user.avatar', ['user_id' => $user->id]);
-    });
-    self::creating(function (User $user) {
-      ['enrollment_number' => $lastEnrollmentNumber] = User::select('enrollment_number')->orderByDesc('id')->first();
-      $enrollment_number = $lastEnrollmentNumber ? ++$lastEnrollmentNumber : 0;
-      $user->enrollment_number = mb_str_pad($enrollment_number, 6, '0', STR_PAD_LEFT);
-      return $user;
-    });
-  }
-
   protected $table = 'users';
   protected $fillable = [
     'name', 'email', 'phone', 'birth', 'gender', 'password', 'avatar_filename',
@@ -43,6 +29,18 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     'email_verified_at',
     'avatar_filename'
   ];
+  protected $appends = ['avatar_url'];
+
+  protected static function boot(): void
+  {
+    parent::boot();
+    self::creating(function (User $user) {
+      ['enrollment_number' => $lastEnrollmentNumber] = User::select('enrollment_number')->orderByDesc('id')->first();
+      $enrollment_number = $lastEnrollmentNumber ? ++$lastEnrollmentNumber : 0;
+      $user->enrollment_number = mb_str_pad($enrollment_number, 6, '0', STR_PAD_LEFT);
+      return $user;
+    });
+  }
 
   public function scopeActive(Builder $query): void
   {
@@ -52,6 +50,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
   public function password(): Attribute
   {
     return Attribute::set(fn ($value) => Hash::make($value));
+  }
+
+  public function avatarUrl(): Attribute
+  {
+    return Attribute::get(fn () => $this->avatar_filename ? route('user.avatar', ['user_id' => $this->id]) : null);
   }
 
   public function getJWTIdentifier()
