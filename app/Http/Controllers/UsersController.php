@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\{Request, JsonResponse};
 use Symfony\Component\HttpFoundation\Response;
 
@@ -87,7 +87,7 @@ class UsersController extends Controller
     );
     $file = $request->file('avatar');
     $avatar_filename = Uuid::uuid4()->toString() . '.' . $file->getClientOriginalExtension();
-    $avatarDisk = Storage::disk('avatar');
+    $avatarDisk = Storage::disk('avatars');
     $avatarDisk->put($avatar_filename, $file->getContent());
     $user = auth()->user();
     $oldAvatarFilename = $user->avatar_filename;
@@ -102,7 +102,7 @@ class UsersController extends Controller
   public function getAvatar(Request $request, $user_id)
   {
     $user = User::select('avatar_filename')->findOrFail($user_id);
-    return response()->file(Storage::disk('avatar')->path($user->avatar_filename));
+    return response()->file(Storage::disk('avatars')->path($user->avatar_filename));
   }
 
   public function store(Request $request): JsonResponse

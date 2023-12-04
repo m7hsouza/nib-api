@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Ramsey\Uuid\Uuid;
 use App\Models\Article;
 use Illuminate\Support\Facades\Storage;
-use Ramsey\Uuid\Uuid;
 use Illuminate\Http\{Request, JsonResponse};
 use Symfony\Component\HttpFoundation\Response;
 
@@ -21,7 +21,7 @@ class ArticlesController extends Controller
 
   public function index(): JsonResponse
   {
-    $articles = Article::with('author:id,name,avatar_url')->orderByDesc('updated_at')->cursorPaginate(10);
+    $articles = Article::with('author:id,name')->orderByDesc('updated_at')->cursorPaginate(10);
     return response()->json($articles);
   }
 
@@ -51,7 +51,7 @@ class ArticlesController extends Controller
     );
     $file = $request->file('image');
     $filename = Uuid::uuid4()->toString() . '.' . $file->getClientOriginalExtension();
-    Storage::disk('article')->put($filename, $file->getContent());
+    Storage::disk('articles')->put($filename, $file->getContent());
     $article = Article::create([
       ...compact('filename'),
       ...$request->only('title', 'content'),
@@ -81,6 +81,6 @@ class ArticlesController extends Controller
   public function image($article_id)
   {
     $article = Article::select('filename')->findOrFail($article_id);
-    return response()->file(Storage::disk('article')->path($article->filename));
+    return response()->file(Storage::disk('articles')->path($article->filename));
   }
 }

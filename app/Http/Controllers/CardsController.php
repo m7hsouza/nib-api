@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Card;
-use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\{Request, JsonResponse};
 use Symfony\Component\HttpFoundation\Response;
 
@@ -49,8 +49,8 @@ class CardsController extends Controller
     );
     $file = $request->file('image');
     $filename = Uuid::uuid4()->toString() . '.' . $file->getClientOriginalExtension();
-    Storage::disk('article')->put($filename, $file->getContent());
-    $card = Article::create([
+    Storage::disk('articles')->put($filename, $file->getContent());
+    $card = Card::create([
       ...compact('filename'),
       ...$request->only('title'),
     ]);
@@ -76,6 +76,6 @@ class CardsController extends Controller
   public function image($card_id)
   {
     $card = Card::select('filename')->findOrFail($card_id);
-    return response()->file(Storage::disk('article')->path($card->filename));
+    return response()->file(Storage::disk('articles')->path($card->filename));
   }
 }

@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Article;
 use App\Models\Video;
-use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\{Request, JsonResponse};
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,7 +21,7 @@ class VideosController extends Controller
 
   public function index(): JsonResponse
   {
-    $videos = Video::with('user:id,name,avatar_url')->orderByDesc('updated_at')->cursorPaginate(10);
+    $videos = Video::with('user:id,name')->orderByDesc('updated_at')->cursorPaginate(10);
     return response()->json($videos);
   }
 
@@ -39,20 +38,20 @@ class VideosController extends Controller
       [
         'title' => 'required|string',
         'description' => 'required|string',
-        'video' => 'required|mimes:mp4',
+        'video' => 'required|mimetypes:video/*',
       ],
       [
         'title.required' => 'O titulo é obrigatório',
         'description.required' => 'A descrição é obrigatória',
         'video' => [
           'required' => 'O video é obrigatório.',
-          'mimes' => 'Formato do video inválido.'
+          'mimetypes' => 'Formato do video inválido.'
         ]
       ]
     );
     $video = $request->file('video');
     $filename = Uuid::uuid4()->toString() . '.' . $video->getClientOriginalExtension();
-    Storage::disk('video')->put($filename, $video->getContent());
+    Storage::disk('videos')->put($filename, $video->getContent());
     $video = Video::create([
       ...compact('filename'),
       ...$request->only('title', 'description'),
@@ -82,6 +81,6 @@ class VideosController extends Controller
   public function file($video_id)
   {
     $video = Video::select('filename')->findOrFail($video_id);
-    return response()->file(Storage::disk('video')->path($video->filename));
+    return response()->file(Storage::disk('videos')->path($video->filename));
   }
 }

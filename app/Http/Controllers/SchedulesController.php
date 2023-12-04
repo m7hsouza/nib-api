@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Task;
 use App\Enums\Shifts;
 use App\Models\Schedule;
-use App\Models\Task;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Http\{Request, JsonResponse};
