@@ -14,6 +14,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
   $router->post('/refresh', 'AuthController@refresh');
 
   $router->get('/articles', 'ArticlesController@index');
+  $router->get('/recent-articles', 'ArticlesController@recentArticles');
   $router->group(['prefix' => 'article'], function () use ($router) {
     $router->get('/{article_id}', 'ArticlesController@show');
     $router->get('/{article_id}/image', ['as' => 'article.image', 'uses' => 'ArticlesController@image']);

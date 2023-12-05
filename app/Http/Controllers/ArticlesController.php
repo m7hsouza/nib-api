@@ -21,13 +21,22 @@ class ArticlesController extends Controller
 
   public function index(): JsonResponse
   {
-    $articles = Article::with('author:id,name')->orderByDesc('updated_at')->cursorPaginate(10);
+    $articles = Article::with('author:id,name,avatar_filename')->orderByDesc('updated_at')->cursorPaginate(10);
+    return response()->json($articles);
+  }
+
+  public function recentArticles(): JsonResponse
+  {
+    $articles = Article::with('author:id,name,avatar_filename')
+      ->orderByDesc('updated_at')
+      ->limit(6)
+      ->get();
     return response()->json($articles);
   }
 
   public function show($article_id)
   {
-    $article = Article::findOrFail($article_id);
+    $article = Article::with('author:id,name,avatar_filename')->findOrFail($article_id);
     return response()->json($article);
   }
 
