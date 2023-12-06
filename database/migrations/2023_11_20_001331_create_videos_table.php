@@ -16,7 +16,8 @@ return new class extends Migration {
       $table->string('description');
       $table->unsignedInteger('likes')->default(0);
       $table->unsignedBigInteger('user_id');
-      $table->string('filename');
+      $table->string('video_filename');
+      $table->string('thumbnail_filename');
       $table->softDeletes();
       $table->timestamps();
 

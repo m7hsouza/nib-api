@@ -39,6 +39,7 @@ class VideosController extends Controller
         'title' => 'required|string',
         'description' => 'required|string',
         'video' => 'required|mimetypes:video/*',
+        'thumbnail' => 'required|mimes:jpg,png,jpeg',
       ],
       [
         'title.required' => 'O titulo é obrigatório',
@@ -46,14 +47,24 @@ class VideosController extends Controller
         'video' => [
           'required' => 'O video é obrigatório.',
           'mimetypes' => 'Formato do video inválido.'
+        ],
+        'thumbnail' => [
+          'required' => 'O arquivo é obrigatório.',
+          'mimes' => 'Formato do arquivo inválido.'
         ]
       ]
     );
     $video = $request->file('video');
-    $filename = Uuid::uuid4()->toString() . '.' . $video->getClientOriginalExtension();
-    Storage::disk('videos')->put($filename, $video->getContent());
+    $uuid = Uuid::uuid4()->toString();
+    $video_filename = "$uuid.{$video->getClientOriginalExtension()}";
+    Storage::disk('videos')->put($video_filename, $video->getContent());
+
+    $thumbnail = $request->file('thumbnail');
+    $thumbnail_filename = "$uuid.{$thumbnail->getClientOriginalExtension()}";
+    Storage::disk('thumbnails')->put($thumbnail_filename, $thumbnail->getContent());
+
     $video = Video::create([
-      ...compact('filename'),
+      ...compact('video_filename', 'thumbnail_filename'),
       ...$request->only('title', 'description'),
     ]);
     $video->refresh();
@@ -80,7 +91,12 @@ class VideosController extends Controller
 
   public function file($video_id)
   {
-    $video = Video::select('filename')->findOrFail($video_id);
-    return response()->file(Storage::disk('videos')->path($video->filename));
+    $video = Video::select('video_filename')->findOrFail($video_id);
+    return response()->file(Storage::disk('videos')->path($video->video_filename));
+  }
+  public function thumbnail($video_id)
+  {
+    $video = Video::select('thumbnail_filename')->findOrFail($video_id);
+    return response()->file(Storage::disk('thumbnails')->path($video->thumbnail_filename));
   }
 }

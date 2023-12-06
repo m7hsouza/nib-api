@@ -25,9 +25,11 @@ $router->group(['prefix' => 'api'], function () use ($router) {
   });
 
   $router->get('/videos', 'VideosController@index');
+  $router->get('/recent-videos', 'ArticlesController@recentVideos');
   $router->group(['prefix' => 'video'], function () use ($router) {
     $router->get('/{video_id}', 'VideosController@show');
     $router->get('/{video_id}/file', ['as' => 'video.file', 'uses' => 'VideosController@file']);
+    $router->get('/{video_id}/thumbnail', ['as' => 'video.thumbnail', 'uses' => 'VideosController@thumbnail']);
     $router->post('/', 'VideosController@store');
     $router->put('/{video_id}', 'VideosController@update');
     $router->delete('/{video_id}', 'VideosController@delete');

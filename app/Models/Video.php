@@ -15,9 +15,9 @@ class Video extends Model implements AuthorizableContract
   use Authorizable, SoftDeletes;
 
   protected $table = 'videos';
-  protected $fillable = ['title', 'description', 'filename', 'likes'];
-  protected $hidden = ['deleted_at', 'filename'];
-  protected $appends = ['url'];
+  protected $fillable = ['title', 'description', 'video_filename', 'thumbnail_filename', 'likes'];
+  protected $hidden = ['deleted_at', 'video_filename', 'thumbnail_filename'];
+  protected $appends = ['video_url', 'thumbnail_url'];
 
   protected static function boot(): void
   {
@@ -33,8 +33,13 @@ class Video extends Model implements AuthorizableContract
     return $this->belongsTo(User::class);
   }
   
-  public function url(): Attribute
+  public function videoUrl(): Attribute
   {
     return Attribute::get(fn () => route('video.file', ['video_id' => $this->id]));
+  }
+
+  public function thumbnailUrl(): Attribute
+  {
+    return Attribute::get(fn () => route('video.thumbnail', ['video_id' => $this->id]));
   }
 }
