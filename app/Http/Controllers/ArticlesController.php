@@ -47,7 +47,7 @@ class ArticlesController extends Controller
       [
         'title' => 'required|string',
         'content' => 'required|string',
-        'image' => 'required|mimes:jpg,png,jpeg',
+        'image' => 'required|mimes:jpg,png,jpeg,webp',
       ],
       [
         'title.required' => 'O titulo é obrigatório',

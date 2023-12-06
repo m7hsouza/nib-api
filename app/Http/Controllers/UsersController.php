@@ -130,6 +130,7 @@ class UsersController extends Controller
       'already_accepted_term',
       'is_active'
     ));
+    $user->assignRole('user');
     $user->refresh();
     return response()->json($user, Response::HTTP_CREATED);
   }
