@@ -35,6 +35,6 @@ class Card extends Model implements AuthorizableContract
 
   public function imageUrl(): Attribute
   {
-    return Attribute::get(fn () => route('article.image', ['article_id' => $this->id]));
+    return Attribute::get(fn () => route('card.image', ['card_id' => $this->id]));
   }
 }
