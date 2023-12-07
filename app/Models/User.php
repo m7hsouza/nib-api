@@ -32,10 +32,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
   protected $appends = ['avatar_url'];
 
   protected $casts = [
-    'is_active' => boolean,
-    'password_change_required' => boolean,
-    'is_already_baptized' => boolean,
-    'already_accepted_term' => boolean,
+    'is_active' => 'boolean',
+    'password_change_required' => 'boolean',
+    'is_already_baptized' => 'boolean',
+    'already_accepted_term' => 'boolean',
   ];
 
   protected static function boot(): void
